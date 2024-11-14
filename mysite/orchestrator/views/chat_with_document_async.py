@@ -63,5 +63,5 @@ async def generate_chatgpt_response(input_text):
     chain = prompt | llm | parser
 
     async for chunk in chain.astream({"topic": input_text}):
-        print(chunk, end="|", flush=True)   
+        print(chunk, end="|", flush=True) 
         yield chunk
