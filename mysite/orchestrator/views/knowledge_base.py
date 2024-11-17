@@ -1,9 +1,9 @@
 import json
 import pprint
 from django.http import HttpResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
-
+from django.shortcuts import render
 
 import logging
 
@@ -27,3 +27,24 @@ def knowledge_view(request):
         return HttpResponse("Invalid JSON", status=500)
     
     return HttpResponse("data added to index", status=200)
+
+@csrf_exempt
+@require_GET
+def embedding_view(request):
+    if request.method == 'GET':
+        return render(request, 'knowledge_base.html')
+    else:
+        return HttpResponse("Method not allowed", status=405)
+
+@csrf_exempt
+@require_GET
+def query_embedding(request):
+    query = request.GET.get('query', '')
+    if not query:
+        return HttpResponse("Query parameter is required", status=400)
+    
+    chroma_embedding = ChromaEmbedding()
+    results = chroma_embedding.query_docs(query=query, n_results=5)
+    return HttpResponse(json.dumps(results), content_type="application/json")
+
+

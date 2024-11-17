@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <h1>Knowledge Base</h1>
+    <form id="query-form">
+        <input type="text" id="query-input" placeholder="Enter your query">
+        <button type="submit">Search</button>
+    </form>
+    <ul id="document-list">
+        <!-- Documents will be populated here -->
+    </ul>
+    <script>
+        document.getElementById('query-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const query = document.getElementById('query-input').value;
+            const response = await fetch(`/alchemist/api/query_embedding?query=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            const documentList = document.getElementById('document-list');
+            documentList.innerHTML = '';
+            results.forEach(result => {
+                const listItem = document.createElement('li');
+                listItem.textContent = result;
+                documentList.appendChild(listItem);
+            });
+        });
+    </script>
+</body>
+</html>

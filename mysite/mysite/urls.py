@@ -22,6 +22,3 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("alchemist/", include("orchestrator.urls"))
 ]
-
-from django.contrib import admin
-from django.urls import include, path
