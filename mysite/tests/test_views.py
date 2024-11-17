@@ -14,3 +14,10 @@ class KnowledgeViewTest(TestCase):
         response = self.client.post(url, data=json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), 'data added to index')
+
+    def test_get_knowledge(self):
+        url = reverse('knowledge_view')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response, JsonResponse)
+        self.assertIn('data', response.json())

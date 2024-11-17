@@ -1,0 +1,29 @@
+from orchestrator.embedding.chroma_embedding import ChromaEmbedding
+
+
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+
+class AlchemistGPT:
+    def __init__(self):
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.3, streaming=True)
+        self.prompt = ChatPromptTemplate.from_template("""You are a world class question answering system and very good at summarizing doc.:
+            <context>
+            {context}
+            </context>
+
+            Question: {input}""")
+        chroma = ChromaEmbedding()
+        self.embeddings = chroma.embeddings
+        self.vector_store = chroma.vector_store
+
+    async def astream(self, message):
+        output_parser = StrOutputParser()
+        document_chain = create_stuff_documents_chain(self.llm, prompt=self.prompt, output_parser=output_parser)
+        retriever = self.vector_store.as_retriever(search_kwargs={'k': 3})
+        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        return retrieval_chain.astream({"input": message})

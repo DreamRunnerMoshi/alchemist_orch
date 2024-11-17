@@ -5,7 +5,8 @@ from typing import List
 import uuid
 import chromadb
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
+from langchain_chroma import Chroma
 
 os.environ["OPENAI_API_KEY"] = 'sk-proj-zdiUmjsNs6PACoKSWrR2T3BlbkFJhOvMKIisyFJUdp2F13t3'
 
@@ -19,15 +20,26 @@ class DocumentToIndex:
 
 class ChromaEmbedding:
     def __init__(self):
-        self.chroma_client = chromadb.PersistentClient(path="chroma_db")
-        self.collection = self.chroma_client.get_or_create_collection(name="alchemist_collection_v1")
+        self.embeddings = OpenAIEmbeddings(
+            model="text-embedding-3-large",
+            # With the `text-embedding-3` class
+            # of models, you can specify the size
+            # of the embeddings you want returned.
+            # dimensions=1024
+        )
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=512,
+            chunk_size=1024,
             chunk_overlap=50,
             length_function=len,
             is_separator_regex=False,
         )
-        self.embeddings = OpenAIEmbeddings()
+        persistent_client = chromadb.PersistentClient()
+        self.vector_store = Chroma(
+            client=persistent_client,
+            collection_name="alchemist_collection_v2",
+            embedding_function=self.embeddings,
+            persist_directory="chroma_db"
+        )
 
     def index_docs(self, docs: List[DocumentToIndex]): 
         for doc in docs:
@@ -38,41 +50,33 @@ class ChromaEmbedding:
         pprint.pprint(f" docs: {doc_splits}")
         for split in doc_splits:
             pprint.pprint(split.page_content)
-            generated_id = uuid.uuid4()
-            embedding = self.embeddings.embed_text(split.page_content)
-            self.collection.add(
-                    documents = [split.page_content],
-                    metadatas = [{"url": doc.url, "title": doc.title}],
-                    ids = [str(generated_id)],
-                    embeddings = [embedding]
-                )
+            self.vector_store.add_texts(
+                texts=[split.page_content],
+                metadatas=[{"url": doc.url, "title": doc.title}]
+            )
 
     def query_docs(self, query: str, n_results: int) -> List[str]:
-        results = self.collection.query(
-            query_texts=[query],
-            n_results=n_results,
-            # where={"metadata_field": "is_equal_to_this"}, # optional filter
-            # where_document={"$contains":"search_string"}  # optional filter
+        results = self.vector_store.similarity_search(
+            query=query,
+            k=n_results
         )
         return self._format_query_result(results)
 
-    def _format_query_result(self, results: chromadb.QueryResult) -> List[str]:
-        
-        if(results is None):
+    def _format_query_result(self, results: List[dict]) -> List[str]:
+        if not results:
             return []
         
         formatted_results = []
-        result_documents = results.get("documents")
-        for documents in result_documents:
-            for document in documents:
-                formatted_results.append(document)
+        for res in results:
+            formatted_results.append(res.page_content)
+            print(f"* {res.page_content} [{res.metadata}]")
                 
         return formatted_results
 
 if __name__ == "__main__":
     chroma_embedding = ChromaEmbedding()
     results = chroma_embedding.query_docs(
-        query="Query about document spliting",
+        query="test",
         n_results=2,
         # where={"metadata_field": "is_equal_to_this"}, # optional filter
         # where_document={"$contains":"search_string"}  # optional filter
