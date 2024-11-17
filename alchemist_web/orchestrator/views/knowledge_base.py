@@ -1,5 +1,4 @@
 import json
-import pprint
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
@@ -44,7 +43,7 @@ def query_embedding(request):
         return HttpResponse("Query parameter is required", status=400)
     
     chroma_embedding = ChromaEmbedding()
-    results = chroma_embedding.search_chroma(query=query, n_results=5)
+    results = chroma_embedding.search_chroma(query=query, n_results=3)
     
     # Convert SearchResult objects to dictionaries
     results_dict = [result.to_dict() for result in results]
