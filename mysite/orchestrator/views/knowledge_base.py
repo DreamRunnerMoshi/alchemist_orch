@@ -44,7 +44,11 @@ def query_embedding(request):
         return HttpResponse("Query parameter is required", status=400)
     
     chroma_embedding = ChromaEmbedding()
-    results = chroma_embedding.query_docs(query=query, n_results=5)
-    return HttpResponse(json.dumps(results), content_type="application/json")
+    results = chroma_embedding.search_chroma(query=query, n_results=5)
+    
+    # Convert SearchResult objects to dictionaries
+    results_dict = [result.to_dict() for result in results]
+    
+    return HttpResponse(json.dumps(results_dict), content_type="application/json")
 
 
