@@ -7,8 +7,7 @@ from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
-
+from .model_providers import ModelProvider
 load_dotenv()
 
 os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
@@ -22,7 +21,7 @@ by retrieving relevant documents and generating responses using a retrieval chai
 
 class AlchemistGPT:
     def __init__(self):
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.3, streaming=True)
+        self.llm = ModelProvider().get_model()
         self.prompt = ChatPromptTemplate.from_template("""You are a world class question answering system and very good at summarizing doc.:
             <context>
             {context}

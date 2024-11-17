@@ -20,10 +20,6 @@ def knowledge_view(request):
         text = body.get('text')
         url = body.get('pageUrl')
 
-        # pprint.pprint("Request title: %s", title)
-        # pprint.pprint("Request text: %s", text)
-        # pprint.pprint("Request url: %s", url)
-
         doc_to_index = DocumentToIndex(title=title, text=text, url=url)
         ChromaEmbedding().index_doc(doc_to_index)
     except json.JSONDecodeError:
