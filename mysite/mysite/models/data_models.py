@@ -31,5 +31,5 @@ class WebSocketPayload:
     def from_json(json_data: dict) -> 'WebSocketPayload':
         payload = json.loads(json_data['text'])
         pprint.pprint(payload['messages'])
-        user_conversations = [ChatBotMessage(**msg) for msg in payload['messages']]
+        user_conversations = [ChatBotMessage(**msg) for msg in payload.get('messages', [])]
         return WebSocketPayload(type=json_data['type'], messages=user_conversations)

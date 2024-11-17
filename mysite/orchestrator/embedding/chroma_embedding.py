@@ -47,7 +47,6 @@ class ChromaEmbedding:
 
     def index_doc(self, doc: DocumentToIndex): 
         doc_splits = self.text_splitter.create_documents([doc.text])
-        pprint.pprint(f" docs: {doc_splits}")
         for split in doc_splits:
             pprint.pprint(split.page_content)
             self.vector_store.add_texts(
@@ -69,7 +68,6 @@ class ChromaEmbedding:
         formatted_results = []
         for res in results:
             formatted_results.append(res.page_content)
-            print(f"* {res.page_content} [{res.metadata}]")
                 
         return formatted_results
 
@@ -78,9 +76,5 @@ if __name__ == "__main__":
     results = chroma_embedding.query_docs(
         query="test",
         n_results=2,
-        # where={"metadata_field": "is_equal_to_this"}, # optional filter
-        # where_document={"$contains":"search_string"}  # optional filter
     )
     pprint.pprint(results)
-    #formatted = chroma_embedding._format_query_result(results)
-    #pprint.pprint(formatted)

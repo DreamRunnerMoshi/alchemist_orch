@@ -12,6 +12,14 @@ from langchain_openai import ChatOpenAI
 load_dotenv()
 
 os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
+
+"""
+The AlchemistGPT class is designed to provide a question-answering and document summarization system using OpenAI's GPT-3.5-turbo model. 
+It integrates with a Chroma-based embedding and vector store for document retrieval. The class initializes the language model, 
+prompt template, embeddings, and vector store. It also includes an asynchronous method 'astream' that processes input messages 
+by retrieving relevant documents and generating responses using a retrieval chain.
+"""
+
 class AlchemistGPT:
     def __init__(self):
         self.llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.3, streaming=True)
