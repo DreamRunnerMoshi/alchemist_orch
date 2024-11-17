@@ -1,6 +1,5 @@
 import json
 import os
-import pprint
 from typing import List, Tuple
 import chromadb
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -112,7 +111,9 @@ class ChromaEmbedding:
                     id=doc.id,
                     distance=score
                 ))
-                
+               
+        formatted_results = sorted(formatted_results, key=lambda x: x.distance, reverse=False)
+
         return formatted_results
 
     def _format_query_result(self, results: List[dict]) -> List[str]:
