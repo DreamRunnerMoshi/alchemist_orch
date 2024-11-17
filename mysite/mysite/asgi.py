@@ -3,12 +3,12 @@
 from django.urls import path
 from channels.routing import ProtocolTypeRouter, URLRouter
 
-from .chat_with_doc import ChatWithDocumentConsumer
+from .chat_with_yourself import ChatWithYourselfConsumer
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 websocket_urlpatterns = [
-    path('ws/chatgpt/', ChatWithDocumentConsumer.as_asgi()),
+    path('ws/chatgpt/', ChatWithYourselfConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({

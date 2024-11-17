@@ -3,11 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 from .llms.AlchemistGPT import AlchemistGPT
 
-import os
-
-os.environ["OPENAI_API_KEY"] = 'sk-proj-zdiUmjsNs6PACoKSWrR2T3BlbkFJhOvMKIisyFJUdp2F13t3'
-
-class ChatWithDocumentConsumer(AsyncWebsocketConsumer):
+class ChatWithYourselfConsumer(AsyncWebsocketConsumer):
     
     def __init__(self):
         self.groups = [] 
