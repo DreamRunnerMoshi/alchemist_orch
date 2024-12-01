@@ -1,8 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from .models.data_models import WebSocketPayload
-
+from orchestrator.data_models.data_models import WebSocketPayload
 from orchestrator.llms.AlchemistGPT import AlchemistGPT
 
 class ChatWithYourselfConsumer(AsyncWebsocketConsumer):

@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from orchestrator.data_models.data_models import json_to_model
 from orchestrator.embedding.chroma_embedding import ChromaEmbedding
 
 
@@ -33,8 +34,8 @@ class AlchemistGPT:
         self.vector_store = chroma.vector_store
         self.output_parser = StrOutputParser()
 
-    async def astream(self, message):
-        
+    async def astream(self, chat_session: dict):
+        message = self._get_last_message(chat_session)
         # Create a document chain that processes documents using the language model and prompt
         document_chain = create_stuff_documents_chain(
             llm=self.llm,
@@ -49,3 +50,8 @@ class AlchemistGPT:
         
         # Process the input message through the retrieval chain and return the response
         return retrieval_chain.astream({"input": message})
+    
+    def _get_last_message(self, message_history) -> str:
+        chat_session  = json_to_model(message_history)
+        lastMessage = chat_session.messages[-1]
+        return lastMessage.content
